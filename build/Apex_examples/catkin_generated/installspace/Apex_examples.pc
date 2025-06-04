@@ -1,0 +1,8 @@
+prefix=/home/matheus/Documents/Apex_ws/install
+
+Name: Apex_examples
+Description: Description of Apex_examples
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

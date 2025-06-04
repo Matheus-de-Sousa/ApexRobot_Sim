@@ -1,0 +1,14 @@
+<launch>
+<rosparam file="$(find apex_controller)/config/controller.yaml" command="load"/>
+<rosparam file="$(find joint_state_controller)/joint_state_controller.yaml" command="load"/>
+
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+<node pkg="tf" type="static_transform_publisher" name="map_to_base" args="1 0 0 0 0 0 1 /map /dummy_link 10" />
+
+<node name="controller_spwaner" pkg="controller_manager" type="spawner" respawn="false"
+    	output="screen" ns="/quad_robo" args="joint_state_controller brt_position_controller brl_position_controller brs_position_controller frt_position_controller frl_position_controller frs_position_controller blt_position_controller bll_position_controller bls_position_controller flt_position_controller fll_position_controller fls_position_controller"/>
+
+<node pkg="apex_controller" type="apex_controller_node.py" name="apex_controller_node"
+	  respawn="true" output="screen"/>
+</launch>

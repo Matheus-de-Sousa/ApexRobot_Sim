@@ -1,0 +1,7 @@
+set(apex_controller_SETUP_PY_SETUP_MODULE "distutils.core")
+set(apex_controller_SETUP_PY_VERSION "0.0.0")
+set(apex_controller_SETUP_PY_SCRIPTS "")
+set(apex_controller_SETUP_PY_PACKAGES "apex_controller")
+set(apex_controller_SETUP_PY_PACKAGE_DIRS "src/apex_controller")
+set(apex_controller_SETUP_PY_MODULES "")
+set(apex_controller_SETUP_PY_MODULE_DIRS "")
