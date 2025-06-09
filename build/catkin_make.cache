@@ -1,2 +1,0 @@
-Apex_examples:apex_controller:apex_description
--DCATKIN_DEVEL_PREFIX=/home/matheus/Documents/Apex_ws/devel -DCMAKE_INSTALL_PREFIX=/home/matheus/Documents/Apex_ws/install -G Unix Makefiles

@@ -1,8 +1,0 @@
-prefix=/home/matheus/Documents/Apex_ws/install
-
-Name: apex_controller
-Description: Description of apex_controller
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: std_msgs
