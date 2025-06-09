@@ -1,8 +1,0 @@
-prefix=/home/matheus/Documents/Apex_ws/devel
-
-Name: apex_description
-Description: Description of apex_description
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
