@@ -15,7 +15,7 @@ class locomotion_controller(object):
         self.lastGaitIndex = 0
         self.lastElapsedTime = 0
 
-        self.forward_factor = 0
+        self.forward_factor = 1
         self.height_factor = 20
         self.rotation_factor = 0
 
@@ -44,9 +44,24 @@ class locomotion_controller(object):
 
     def LocomotionRun(self, elapsedSequenceTime,sequenceTime):
         pass
-    def UpdateMovementSequence(self, elapsedSequenceTime,sequenceTime):
+    def UpdateMovementSequence(self,velMsg, elapsedSequenceTime,sequenceTime):
         ratio = float((elapsedSequenceTime-self.lastElapsedTime)/sequenceTime)
         gaitIndex = int(ratio)
+        if velMsg != None:
+            if velMsg.linear.x > 0:
+                self.forward_factor = 1
+            elif velMsg.linear.x < 0:
+                self.forward_factor = -1
+            else:
+                self.forward_factor = 0
+            
+            if velMsg.angular.z > 0:
+                self.rotation_factor = 15
+            elif velMsg.angular.z < 0:
+                self.rotation_factor = -15
+            else:
+                self.rotation_factor = 0
+
         if(self.lastGaitIndex != gaitIndex):
             self.ShiftKeyframe()
 
@@ -117,10 +132,10 @@ class locomotion_controller(object):
             self.keyframesBackRightLeg[1][2] -= 35
             self.keyframesFrontRightLeg[1][2] -= 35
         else:
-            self.keyframesBackLeftLeg[1][2] += 35
-            self.keyframesFrontLeftLeg[1][2] += 35
-            self.keyframesBackRightLeg[1][2] -= 35
-            self.keyframesFrontRightLeg[1][2] -= 35
+            self.keyframesBackLeftLeg[1][2] -= 35
+            self.keyframesFrontLeftLeg[1][2] -= 35
+            self.keyframesBackRightLeg[1][2] += 35
+            self.keyframesFrontRightLeg[1][2] += 35
         ratio = ratio - gaitIndex
         self.UpdateLegsPosition(ratio)
 
