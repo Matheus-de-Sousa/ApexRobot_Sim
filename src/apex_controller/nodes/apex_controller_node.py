@@ -23,7 +23,7 @@ if __name__ == "__main__":
         deltaT = currentTime - start_time
         if velMsg != None:
             print(f"({velMsg.linear.x},{velMsg.angular.z})")
-        apex_controller.UpdateMovementSequence(velMsg, deltaT.to_sec(), 0.08)
+        apex_controller.UpdateMovementSequence(velMsg, deltaT.to_sec(), 0.04)
         '''if step:
             apex_controller.UpdateMovementSequence(deltaT.to_sec(), 1)
         else:

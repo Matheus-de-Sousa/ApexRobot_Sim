@@ -15,8 +15,8 @@ class locomotion_controller(object):
         self.lastGaitIndex = 0
         self.lastElapsedTime = 0
 
-        self.forward_factor = 1
-        self.height_factor = 20
+        self.forward_factor = 1.2
+        self.height_factor = -50
         self.rotation_factor = 0
 
         self.keyframesFrontLeftLeg = [[-50,800, 160], [-50,800, 160]]
@@ -44,9 +44,7 @@ class locomotion_controller(object):
 
     def LocomotionRun(self, elapsedSequenceTime,sequenceTime):
         pass
-    def UpdateMovementSequence(self,velMsg, elapsedSequenceTime,sequenceTime):
-        ratio = float((elapsedSequenceTime-self.lastElapsedTime)/sequenceTime)
-        gaitIndex = int(ratio)
+    def UpdateMovementSequence(self,velMsg, elapsedSequenceTime,sequenceTime):        
         if velMsg != None:
             if velMsg.linear.x > 0:
                 self.forward_factor = 1
@@ -62,8 +60,17 @@ class locomotion_controller(object):
             else:
                 self.rotation_factor = 0
 
+        ratio = float((elapsedSequenceTime-self.lastElapsedTime)/sequenceTime)
+        if(ratio >= len(self.gaits)):
+            ratio -= len(self.gaits)
+            self.lastElapsedTime += len(self.gaits)*sequenceTime
+
+        gaitIndex = int(ratio)
+        ratio = ratio - gaitIndex
+
         if(self.lastGaitIndex != gaitIndex):
             self.ShiftKeyframe()
+            self.lastGaitIndex = gaitIndex
 
         angle = 45.0/180.0*math.pi
         x_rot = math.sin(angle) * self.rotation_factor
@@ -127,21 +134,17 @@ class locomotion_controller(object):
         self.keyframesBackRightLeg[1] = self.gaits[adjusted_index]'''
         
         if(adjusted_index4 == 1 or adjusted_index3 == 1 or adjusted_index4 == 2 or adjusted_index3 == 2):
-            self.keyframesBackLeftLeg[1][2] += 35
-            self.keyframesFrontLeftLeg[1][2] += 35
-            self.keyframesBackRightLeg[1][2] -= 35
-            self.keyframesFrontRightLeg[1][2] -= 35
+            self.keyframesBackLeftLeg[1][2] -= 30
+            self.keyframesFrontLeftLeg[1][2] -= 30
+            self.keyframesBackRightLeg[1][2] += 30
+            self.keyframesFrontRightLeg[1][2] += 30
         else:
-            self.keyframesBackLeftLeg[1][2] -= 35
-            self.keyframesFrontLeftLeg[1][2] -= 35
-            self.keyframesBackRightLeg[1][2] += 35
-            self.keyframesFrontRightLeg[1][2] += 35
-        ratio = ratio - gaitIndex
-        self.UpdateLegsPosition(ratio)
+            self.keyframesBackLeftLeg[1][2] += 30
+            self.keyframesFrontLeftLeg[1][2] += 30
+            self.keyframesBackRightLeg[1][2] -= 30
+            self.keyframesFrontRightLeg[1][2] -= 30
 
-        if(gaitIndex >= len(self.gaits) - 1):
-            self.lastElapsedTime = elapsedSequenceTime
-        self.lastGaitIndex = gaitIndex
+        self.UpdateLegsPosition(ratio)
 
         self.rate.sleep()
     
