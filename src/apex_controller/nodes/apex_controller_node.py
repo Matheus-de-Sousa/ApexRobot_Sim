@@ -24,6 +24,7 @@ if __name__ == "__main__":
         if velMsg != None:
             print(f"({velMsg.linear.x},{velMsg.angular.z})")
         apex_controller.UpdateMovementSequence(velMsg, deltaT.to_sec(), 0.04)
+        #apex_controller.TrotGaitMovement(velMsg, deltaT.to_sec(), 0.04)
         '''if step:
             apex_controller.UpdateMovementSequence(deltaT.to_sec(), 1)
         else:

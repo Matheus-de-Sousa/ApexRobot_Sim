@@ -12,6 +12,7 @@ class locomotion_controller(object):
         self.rate = rospy.Rate(200)
         #self.gaits = [[100,750,160], [100,550,160], [-100,550,160], [-100,750,160],[-40,750,160],[40,750,160]]
         self.gaits = [[-60,750,160], [-60,650,160], [60,650,160], [60,750,160],[36,750,160],[12,750,160],[-12,750,160],[-36,750,160]]
+        self.trotGait = [[100,750,160], [100,650,160], [-100,650,160], [-100,750,160],[-40,750,160],[40,750,160]]
         self.lastGaitIndex = 0
         self.lastElapsedTime = 0
 
@@ -42,8 +43,74 @@ class locomotion_controller(object):
 
         self.stand()
 
-    def LocomotionRun(self, elapsedSequenceTime,sequenceTime):
-        pass
+    def TrotGaitMovement(self, velMsg, elapsedSequenceTime,sequenceTime):
+        if velMsg != None:
+            if velMsg.linear.x > 0:
+                self.forward_factor = 1
+            elif velMsg.linear.x < 0:
+                self.forward_factor = -1
+            else:
+                self.forward_factor = 0
+            
+            if velMsg.angular.z > 0:
+                self.rotation_factor = 15
+            elif velMsg.angular.z < 0:
+                self.rotation_factor = -15
+            else:
+                self.rotation_factor = 0
+
+        ratio = float((elapsedSequenceTime-self.lastElapsedTime)/sequenceTime)
+        if(ratio >= len(self.trotGait)):
+            ratio -= len(self.trotGait)
+            self.lastElapsedTime += len(self.trotGait)*sequenceTime
+
+        gaitIndex = int(ratio)
+        ratio = ratio - gaitIndex
+
+        if(self.lastGaitIndex != gaitIndex):
+            self.ShiftKeyframe()
+            self.lastGaitIndex = gaitIndex
+
+        angle = 45.0/180.0*math.pi
+        x_rot = math.sin(angle) * self.rotation_factor
+        z_rot = math.cos(angle) * self.rotation_factor
+
+        angle = (45+self.trotGait[gaitIndex][0])/180.0*math.pi
+        x_rotFR = x_rot-math.sin(angle) * self.rotation_factor
+        z_rotFR = z_rot-math.cos(angle) * self.rotation_factor
+
+        self.keyframesFrontRightLeg[1] = self.trotGait[gaitIndex].copy()
+        self.keyframesFrontRightLeg[1][1] += self.height_factor
+        self.keyframesFrontRightLeg[1][0] = self.keyframesFrontRightLeg[1][0]*self.forward_factor + x_rotFR
+        self.keyframesFrontRightLeg[1][2] += z_rotFR 
+
+        self.keyframesBackLeftLeg[1] = self.trotGait[gaitIndex].copy()
+        self.keyframesBackLeftLeg[1][1] += self.height_factor
+        self.keyframesBackLeftLeg[1][0] = self.keyframesBackLeftLeg[1][0]*self.forward_factor - x_rotFR
+        self.keyframesBackLeftLeg[1][0] += z_rotFR
+
+        adjusted_index = gaitIndex + int(len(self.trotGait)/2)
+        if(adjusted_index >= len(self.trotGait)):
+            adjusted_index -= len(self.trotGait)
+        
+        angle = (45+self.trotGait[adjusted_index][0])/180.0*math.pi
+        x_rotFL = x_rot-math.sin(angle) * self.rotation_factor
+        z_rotFL = z_rot-math.cos(angle) * self.rotation_factor
+
+        self.keyframesFrontLeftLeg[1] = self.trotGait[adjusted_index].copy()
+        self.keyframesFrontLeftLeg[1][1] += self.height_factor
+        self.keyframesFrontLeftLeg[1][0] = self.keyframesFrontLeftLeg[1][0]*self.forward_factor - x_rotFL
+        self.keyframesFrontLeftLeg[1][2] += -z_rotFL
+
+        self.keyframesBackRightLeg[1] = self.trotGait[adjusted_index].copy()
+        self.keyframesBackRightLeg[1][1] += self.height_factor
+        self.keyframesBackRightLeg[1][0] = self.keyframesBackRightLeg[1][0]*self.forward_factor + x_rotFL
+        self.keyframesBackRightLeg[1][2] += -z_rotFL
+
+        self.UpdateLegsPosition(ratio)
+
+        self.rate.sleep()
+
     def UpdateMovementSequence(self,velMsg, elapsedSequenceTime,sequenceTime):        
         if velMsg != None:
             if velMsg.linear.x > 0:
@@ -124,14 +191,6 @@ class locomotion_controller(object):
         self.keyframesBackLeftLeg[1][1] += self.height_factor
         self.keyframesBackLeftLeg[1][0] = self.keyframesBackLeftLeg[1][0]*self.forward_factor - x_rotBL
         self.keyframesBackLeftLeg[1][0] += z_rotBL
-        '''self.keyframesFrontRightLeg[1] = self.gaits[gaitIndex]
-        self.keyframesBackLeftLeg[1] = self.gaits[gaitIndex]
-
-        adjusted_index = gaitIndex + int(len(self.gaits)/2)
-        if(adjusted_index >= len(self.gaits)):
-            adjusted_index -= len(self.gaits)
-        self.keyframesFrontLeftLeg[1] = self.gaits[adjusted_index]
-        self.keyframesBackRightLeg[1] = self.gaits[adjusted_index]'''
         
         if(adjusted_index4 == 1 or adjusted_index3 == 1 or adjusted_index4 == 2 or adjusted_index3 == 2):
             self.keyframesBackLeftLeg[1][2] -= 30
