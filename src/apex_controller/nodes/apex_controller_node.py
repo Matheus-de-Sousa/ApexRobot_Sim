@@ -14,6 +14,13 @@ if __name__ == "__main__":
     apex_controller = locomotion_controller()
     vel_sub = rospy.Subscriber("apex_controller/cmd_vel", Twist, velCallback)
 
+    '''style.use('fivethirtyeight')
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1,1,1)
+
+    ani = animation.FuncAnimation(fig, apex_controller.gaitGraph, interval=1000, fargs=(ax1,))
+    plt.show(block = False)'''
+
     start_time = 0
     while not start_time:
         start_time = rospy.Time.now()
@@ -23,8 +30,9 @@ if __name__ == "__main__":
         deltaT = currentTime - start_time
         if velMsg != None:
             print(f"({velMsg.linear.x},{velMsg.angular.z})")
-        apex_controller.UpdateMovementSequence(velMsg, deltaT.to_sec(), 0.04)
-        #apex_controller.TrotGaitMovement(velMsg, deltaT.to_sec(), 0.04)
+        #apex_controller.UpdateMovementSequence(velMsg, deltaT.to_sec(), 1)
+        apex_controller.TrotGaitMovement(velMsg, deltaT.to_sec(), 1)
+        apex_controller.gaitGraph()
         '''if step:
             apex_controller.UpdateMovementSequence(deltaT.to_sec(), 1)
         else:
