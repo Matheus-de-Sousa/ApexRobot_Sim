@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
 )
 
 catkin_python_setup()
@@ -13,6 +14,7 @@ catkin_python_setup()
 catkin_package(
   CATKIN_DEPENDS
   std_msgs
+  geometry_msgs
 )
 
 include_directories(
